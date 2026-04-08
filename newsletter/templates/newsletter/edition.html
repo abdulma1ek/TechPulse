@@ -1,0 +1,30 @@
+{% extends "newsletter/base.html" %}
+{% block title %}{{ edition.name }} — TechPulse{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:1rem">
+  <a href="{% url 'edition-list' %}" style="font-size:.85rem;color:#6b7280">← All Editions</a>
+</div>
+
+<div class="page-header">
+  <h1>{{ edition.name }}</h1>
+  <p>
+    <span class="badge badge-{{ edition.edition_type }}">{{ edition.get_edition_type_display }}</span>
+    &nbsp;
+    {{ edition.article_count }} article{{ edition.article_count|pluralize }}
+    &nbsp;·&nbsp;
+    Window: {{ edition.window_start|date:"M d" }} – {{ edition.window_end|date:"M d, Y" }}
+    &nbsp;·&nbsp;
+    Generated: {{ edition.generated_at|date:"Y-m-d H:i" }} UTC
+  </p>
+</div>
+
+<div class="card edition-body">
+  {{ rendered_content|safe }}
+</div>
+
+<div style="margin-top:1rem;display:flex;gap:1rem">
+  <a href="{% url 'edition-list' %}" class="btn btn-primary">← Back to Editions</a>
+  <a href="{% url 'dashboard' %}" class="btn btn-primary" style="background:#6b7280">Dashboard</a>
+</div>
+{% endblock %}

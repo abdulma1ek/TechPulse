@@ -1,0 +1,130 @@
+{% extends "newsletter/base.html" %}
+{% block title %}Dashboard — TechPulse{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>TechPulse Dashboard</h1>
+  <p>Database-driven AI &amp; Tech Newsletter System</p>
+</div>
+
+<!-- Stats cards -->
+<div class="grid-4">
+  <div class="card">
+    <h2>Total Articles</h2>
+    <div class="value">{{ total_articles }}</div>
+  </div>
+  <div class="card">
+    <h2>This Week</h2>
+    <div class="value">{{ articles_this_week }}</div>
+  </div>
+  <div class="card">
+    <h2>Pending Tagging</h2>
+    <div class="value" style="color:{% if untagged_count > 0 %}#d97706{% else %}#059669{% endif %}">{{ untagged_count }}</div>
+  </div>
+  <div class="card">
+    <h2>Editions Generated</h2>
+    <div class="value">{{ recent_editions|length }}</div>
+  </div>
+</div>
+
+<div class="grid-2">
+
+  <!-- Tagging breakdown -->
+  <div class="card">
+    <h2>Tagging Breakdown</h2>
+    <table style="margin-top:.75rem">
+      <thead><tr><th>Method</th><th>Articles</th></tr></thead>
+      <tbody>
+        <tr><td>LLM (Claude)</td><td>{{ llm_tagged }}</td></tr>
+        <tr><td>Keyword rules</td><td>{{ rules_tagged }}</td></tr>
+        <tr><td>Untagged</td><td>{{ untagged_count }}</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Generate edition -->
+  <div class="card">
+    <h2>Generate Edition</h2>
+    <p style="font-size:.85rem;color:#6b7280;margin:.5rem 0 1rem">Calls the <code>newsletter_generate()</code> stored procedure.</p>
+    <form method="post" action="{% url 'generate-edition' %}">
+      {% csrf_token %}
+      <select name="edition_type" style="padding:.45rem .7rem;border:1px solid #d1d5db;border-radius:6px;margin-right:.5rem;font-size:.875rem">
+        {% for key, label in edition_types.items %}
+          <option value="{{ key }}">{{ label }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-primary">Generate</button>
+    </form>
+  </div>
+
+</div>
+
+<div class="grid-2">
+
+  <!-- Sources -->
+  <div class="card">
+    <h2>Sources</h2>
+    <table style="margin-top:.75rem">
+      <thead><tr><th>Source</th><th>Reliability</th></tr></thead>
+      <tbody>
+        {% for source in sources %}
+        <tr>
+          <td>{{ source.name }}</td>
+          <td>{{ source.reliability_score }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="2" style="color:#9ca3af">No sources yet — run <code>manage.py scrape</code></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Top tags -->
+  <div class="card">
+    <h2>Top Tags</h2>
+    <div style="margin-top:.75rem">
+      {% for tag in top_tags %}
+        <span class="tag">{{ tag.tag_name }} ({{ tag.usage_count }})</span>
+      {% empty %}
+        <p style="color:#9ca3af;font-size:.85rem">No tags yet — run <code>manage.py seed_tags</code> then <code>manage.py tag</code></p>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+<!-- Recent editions -->
+<div class="card">
+  <h2>Recent Editions</h2>
+  <table style="margin-top:.75rem">
+    <thead>
+      <tr><th>#</th><th>Name</th><th>Type</th><th>Articles</th><th>Generated</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for edition in recent_editions %}
+      <tr>
+        <td>{{ edition.pk }}</td>
+        <td>{{ edition.name }}</td>
+        <td><span class="badge badge-{{ edition.edition_type }}">{{ edition.get_edition_type_display }}</span></td>
+        <td>{{ edition.article_count }}</td>
+        <td>{{ edition.generated_at|date:"Y-m-d H:i" }}</td>
+        <td><a href="{% url 'edition-detail' edition.pk %}">View →</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" style="color:#9ca3af;text-align:center;padding:1.5rem">No editions yet</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if recent_editions %}<p style="margin-top:.75rem;font-size:.85rem"><a href="{% url 'edition-list' %}">View all editions →</a></p>{% endif %}
+</div>
+
+<!-- Pipeline quick-start -->
+<div class="card" style="margin-top:1.5rem;background:#f8f7ff;border:1px solid #e0e7ff">
+  <h2>Pipeline Commands</h2>
+  <pre style="margin-top:.75rem;font-size:.8rem;line-height:1.7;color:#374151">python manage.py seed_tags          # seed controlled vocabulary
+python manage.py scrape             # scrape 4 RSS sources
+python manage.py tag --limit 50     # tag with Claude + keyword rules
+python manage.py generate_edition --type ai_only --render</pre>
+</div>
+
+{% endblock %}

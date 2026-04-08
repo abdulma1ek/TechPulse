@@ -1,0 +1,41 @@
+{
+  "$schema": "./registry.schema.json",
+  "sources": [
+    {
+      "id": "example-energy-feed",
+      "name": "Energy Intelligence Feed",
+      "url": "https://example.com/feeds/energy.xml",
+      "method": "rss",
+      "tier": 2,
+      "sector": "energy",
+      "language": "en",
+      "active": true,
+      "category": "news",
+      "notes": "General energy news and market analysis"
+    },
+    {
+      "id": "example-govt-press",
+      "name": "Ministry of Energy Press",
+      "url": "https://example.gov/press/rss.xml",
+      "method": "rss",
+      "tier": 1,
+      "sector": "energy",
+      "language": "en",
+      "active": true,
+      "category": "official",
+      "notes": "Official government announcements — auto-pass scoring"
+    },
+    {
+      "id": "example-analyst-report",
+      "name": "Industry Analyst Weekly",
+      "url": "https://example.com/reports/weekly.pdf",
+      "method": "pdf",
+      "tier": 2,
+      "sector": "energy",
+      "language": "en",
+      "active": false,
+      "category": "report",
+      "notes": "Weekly sector report — enable when ready to process PDFs"
+    }
+  ]
+}

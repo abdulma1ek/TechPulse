@@ -1,0 +1,37 @@
+{
+  "name": "sentinel",
+  "version": "1.0.0",
+  "description": "Autonomous multi-source intelligence pipeline — scrape, score, translate, and synthesize news into sector briefings",
+  "main": "sentinel.js",
+  "scripts": {
+    "start": "node sentinel.js",
+    "scrape": "node sentinel.js scrape",
+    "eod": "node sentinel.js eod",
+    "db:init": "node data/init-db.js"
+  },
+  "keywords": [
+    "intelligence",
+    "news",
+    "scraper",
+    "llm",
+    "rss",
+    "monitoring",
+    "sector-analysis"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "better-sqlite3": "^11.7.0",
+    "cheerio": "^1.0.0",
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.7",
+    "openai": "^4.77.0",
+    "pdf-parse": "^1.1.1",
+    "rss-parser": "^3.13.0",
+    "uuid": "^11.0.5"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,63 @@
+{% extends "newsletter/base.html" %}
+{% block title %}Editions — TechPulse{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Newsletter Editions</h1>
+  <p>All generated editions. Filter by type or click to view the full edition.</p>
+</div>
+
+<!-- Filter bar -->
+<div style="margin-bottom:1.5rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
+  <a href="{% url 'edition-list' %}"
+     class="badge {% if not selected_type %}badge-general{% endif %}"
+     style="padding:.35rem .8rem;font-size:.8rem;border:1px solid #d1d5db{% if not selected_type %};border-color:#4f46e5{% endif %}">
+    All
+  </a>
+  {% for key, label in edition_types.items %}
+  <a href="?type={{ key }}"
+     class="badge badge-{{ key }}"
+     style="padding:.35rem .8rem;font-size:.8rem;border:1px solid transparent{% if selected_type == key %};outline:2px solid #4f46e5{% endif %}">
+    {{ label }}
+  </a>
+  {% endfor %}
+</div>
+
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Articles</th>
+        <th>Window</th>
+        <th>Generated</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for edition in editions %}
+      <tr>
+        <td>{{ edition.pk }}</td>
+        <td><strong>{{ edition.name }}</strong></td>
+        <td><span class="badge badge-{{ edition.edition_type }}">{{ edition.get_edition_type_display }}</span></td>
+        <td>{{ edition.article_count }}</td>
+        <td style="font-size:.8rem;color:#6b7280">
+          {{ edition.window_start|date:"M d" }} – {{ edition.window_end|date:"M d, Y" }}
+        </td>
+        <td style="font-size:.85rem">{{ edition.generated_at|date:"Y-m-d H:i" }}</td>
+        <td><a href="{% url 'edition-detail' edition.pk %}" class="btn btn-primary" style="padding:.3rem .7rem;font-size:.8rem">View</a></td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="7" style="text-align:center;padding:2rem;color:#9ca3af">
+          No editions yet. Generate one from the
+          <a href="{% url 'dashboard' %}">Dashboard</a>.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

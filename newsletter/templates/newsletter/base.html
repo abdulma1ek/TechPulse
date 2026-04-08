@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}TechPulse{% endblock %}</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #1a1a1a; }
+    a { color: #4f46e5; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Nav */
+    nav { background: #1e1b4b; padding: 0 2rem; display: flex; align-items: center; gap: 2rem; }
+    nav .brand { color: #fff; font-size: 1.2rem; font-weight: 700; padding: 1rem 0; }
+    nav a { color: #c7d2fe; padding: 1rem 0.5rem; display: inline-block; }
+    nav a:hover { color: #fff; text-decoration: none; }
+
+    /* Layout */
+    .container { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
+
+    /* Cards */
+    .card { background: #fff; border-radius: 8px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+    .card h2 { font-size: 1rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: .05em; margin-bottom: .5rem; }
+    .card .value { font-size: 2.5rem; font-weight: 700; color: #1e1b4b; }
+
+    /* Grid */
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: .6rem 1rem; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; color: #6b7280; border-bottom: 2px solid #e5e7eb; }
+    td { padding: .65rem 1rem; border-bottom: 1px solid #f3f4f6; font-size: .9rem; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f9fafb; }
+
+    /* Badge */
+    .badge { display: inline-block; padding: .2rem .55rem; border-radius: 999px; font-size: .75rem; font-weight: 600; }
+    .badge-ai      { background: #ede9fe; color: #5b21b6; }
+    .badge-general { background: #dbeafe; color: #1d4ed8; }
+    .badge-startups{ background: #d1fae5; color: #065f46; }
+    .badge-policy  { background: #fef3c7; color: #92400e; }
+    .badge-europe  { background: #fce7f3; color: #9d174d; }
+
+    /* Tag chip */
+    .tag { display: inline-block; padding: .15rem .45rem; border-radius: 4px; font-size: .75rem; background: #e0e7ff; color: #3730a3; margin: .1rem; }
+
+    /* Article card */
+    .article { background: #fff; border-radius: 8px; padding: 1.2rem 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,.07); margin-bottom: 1rem; }
+    .article h3 { font-size: 1rem; margin-bottom: .3rem; }
+    .article .meta { font-size: .8rem; color: #6b7280; margin-bottom: .4rem; }
+    .article .summary { font-size: .875rem; color: #374151; margin-bottom: .5rem; }
+
+    /* Buttons */
+    .btn { display: inline-block; padding: .5rem 1.1rem; border-radius: 6px; font-size: .875rem; font-weight: 600; cursor: pointer; border: none; }
+    .btn-primary { background: #4f46e5; color: #fff; }
+    .btn-primary:hover { background: #4338ca; text-decoration: none; }
+
+    /* Page header */
+    .page-header { margin-bottom: 1.5rem; }
+    .page-header h1 { font-size: 1.5rem; font-weight: 700; }
+    .page-header p { color: #6b7280; margin-top: .25rem; }
+
+    /* Edition rendered content */
+    .edition-body h3 { font-size: 1rem; margin: .3rem 0; }
+    .edition-body .meta { font-size: .8rem; color: #6b7280; }
+    .edition-body .summary { font-size: .875rem; margin: .3rem 0; }
+    hr { border: none; border-top: 1px solid #e5e7eb; margin: 1.5rem 0; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">TechPulse</span>
+  <a href="{% url 'dashboard' %}">Dashboard</a>
+  <a href="{% url 'edition-list' %}">Editions</a>
+  <a href="/admin/">Admin</a>
+</nav>
+
+<div class="container">
+  {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>
