@@ -1,12 +1,10 @@
 -- TechPulse Analytics Queries
--- Advanced Databases · IE University
--- Deliverable 5: window functions, source coverage, tagging comparison, FULLTEXT search
+-- Advanced Databases, IE University
+-- Deliverable 5: window functions, source coverage, tagging comparison, fulltext search
 
--- ─────────────────────────────────────────────────────────
--- 1. TOP TAGS BY WEEK  (Window Functions)
---    For each week, shows each tag's count, total tags that
---    week, and the tag's rank within that week.
--- ─────────────────────────────────────────────────────────
+
+-- 1. Top tags by week (window functions)
+-- Shows each tag's count per week, total tags that week, and rank within the week
 SELECT
     t.tag_name,
     t.tag_type,
@@ -26,11 +24,8 @@ GROUP BY t.tag_name, t.tag_type, iso_week
 ORDER BY iso_week DESC, week_rank;
 
 
--- ─────────────────────────────────────────────────────────
--- 2. SOURCE COVERAGE
---    Articles per source in the last 7 days, with average
---    importance score and tagging rate.
--- ─────────────────────────────────────────────────────────
+-- 2. Source coverage (last 7 days)
+-- Articles per source, avg importance, and what % got tagged
 SELECT
     s.name                              AS source_name,
     s.reliability_score,
@@ -49,11 +44,8 @@ GROUP BY s.id
 ORDER BY articles_last_7_days DESC;
 
 
--- ─────────────────────────────────────────────────────────
--- 3. TAGGING METHOD COMPARISON
---    LLM vs keyword rules: total tags, average confidence,
---    distinct articles tagged, and tag type breakdown.
--- ─────────────────────────────────────────────────────────
+-- 3. Tagging method comparison (LLM vs keyword rules)
+-- Overall stats
 SELECT
     at2.assigned_by,
     COUNT(*)                            AS total_tag_assignments,
@@ -63,7 +55,7 @@ SELECT
 FROM article_tags at2
 GROUP BY at2.assigned_by;
 
--- Per-type breakdown
+-- Broken down by tag type
 SELECT
     at2.assigned_by,
     t.tag_type,
@@ -75,11 +67,8 @@ GROUP BY at2.assigned_by, t.tag_type
 ORDER BY at2.assigned_by, t.tag_type;
 
 
--- ─────────────────────────────────────────────────────────
--- 4. FULLTEXT SEARCH
---    Uses the FULLTEXT INDEX ft_articles_title_content.
---    Replace the search term as needed.
--- ─────────────────────────────────────────────────────────
+-- 4. Fulltext search examples
+-- Natural language mode
 SELECT
     a.id,
     a.title,
@@ -94,7 +83,7 @@ WHERE MATCH(a.title, a.content)
 ORDER BY relevance_score DESC
 LIMIT 20;
 
--- Boolean mode search example (exact phrase + exclusion)
+-- Boolean mode (exact phrase + exclusion)
 SELECT
     a.id,
     a.title,
@@ -106,10 +95,7 @@ ORDER BY a.published_at DESC
 LIMIT 10;
 
 
--- ─────────────────────────────────────────────────────────
--- 5. RECENT UNPLACED ARTICLES  (via VIEW)
---    Articles from the last 7 days not yet in any edition.
--- ─────────────────────────────────────────────────────────
+-- 5. Recent unplaced articles (uses the view we created in schema.sql)
 SELECT
     r.id,
     r.title,
@@ -121,11 +107,7 @@ ORDER BY r.importance_score DESC
 LIMIT 20;
 
 
--- ─────────────────────────────────────────────────────────
--- 6. NEWSLETTER EDITION SUMMARY
---    Overview of all generated editions with article counts
---    and running total using a window function.
--- ─────────────────────────────────────────────────────────
+-- 6. Newsletter edition summary with running totals (window function)
 SELECT
     ne.id,
     ne.name,
@@ -145,10 +127,7 @@ FROM newsletter_editions ne
 ORDER BY ne.generated_at DESC;
 
 
--- ─────────────────────────────────────────────────────────
--- 7. TAG USAGE GROWTH OVER TIME
---    How usage_count has evolved per tag (from trigger increments).
--- ─────────────────────────────────────────────────────────
+-- 7. Tag usage rankings
 SELECT
     t.tag_name,
     t.tag_type,

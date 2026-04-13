@@ -1,19 +1,12 @@
--- TechPulse MySQL DDL
--- Advanced Databases · IE University
--- Run AFTER Django migrations: mysql -u root techpulse < schema.sql
+-- TechPulse schema extensions
+-- Run after Django migrations: mysql -u root techpulse < schema.sql
+-- These add fulltext search, triggers, views, stored procs that Django doesn't handle natively
 
--- ─────────────────────────────────────────────────────────
--- FULLTEXT INDEX
--- Powers keyword search across the article corpus
--- ─────────────────────────────────────────────────────────
+-- fulltext index for article search
 ALTER TABLE articles ADD FULLTEXT INDEX ft_articles_title_content (title, content);
 
 
--- ─────────────────────────────────────────────────────────
--- TRIGGER
--- After every INSERT into article_tags, auto-increment
--- the usage_count counter on the corresponding tag row.
--- ─────────────────────────────────────────────────────────
+-- auto-increment tag usage_count when a new article_tag is inserted
 DROP TRIGGER IF EXISTS after_article_tag_insert;
 
 DELIMITER $$
@@ -28,11 +21,7 @@ END$$
 DELIMITER ;
 
 
--- ─────────────────────────────────────────────────────────
--- VIEW
--- recent_unplaced_articles: articles from the last 7 days
--- that have not yet been included in any newsletter edition.
--- ─────────────────────────────────────────────────────────
+-- view: articles from last 7 days not yet placed in any newsletter
 DROP VIEW IF EXISTS recent_unplaced_articles;
 
 CREATE VIEW recent_unplaced_articles AS
@@ -44,20 +33,8 @@ CREATE VIEW recent_unplaced_articles AS
       );
 
 
--- ─────────────────────────────────────────────────────────
--- STORED PROCEDURE
--- newsletter_generate(edition_type)
--- Encapsulates the full filter-and-select logic for a given
--- edition type, creates the edition record, inserts matched
--- articles ordered by importance_score, and updates the count.
---
--- Edition types and their required tags:
---   general  → any article (no tag filter)
---   ai_only  → tag 'ai'
---   startups → tag 'startup' OR 'funding'
---   policy   → tag 'policy' OR 'regulation'
---   europe   → tag 'europe'
--- ─────────────────────────────────────────────────────────
+-- stored procedure: generate a newsletter edition
+-- picks articles matching the edition type's tags, ordered by importance
 DROP PROCEDURE IF EXISTS newsletter_generate;
 
 DELIMITER $$
@@ -68,7 +45,7 @@ BEGIN
     DECLARE v_window_days   INT;
     DECLARE v_edition_name  VARCHAR(255);
 
-    -- Determine the look-back window (policy uses 14 days, all others 7)
+    -- policy editions look back 14 days, everything else 7
     SET v_window_days  = IF(p_edition_type = 'policy', 14, 7);
     SET v_window_start = NOW() - INTERVAL v_window_days DAY;
     SET v_edition_name = CONCAT(
@@ -84,7 +61,6 @@ BEGIN
         DATE_FORMAT(NOW(), '%Y-%m-%d')
     );
 
-    -- Create the edition record
     INSERT INTO newsletter_editions
         (name, edition_type, generated_at, window_start, window_end, article_count)
     VALUES
@@ -92,8 +68,7 @@ BEGIN
 
     SET v_newsletter_id = LAST_INSERT_ID();
 
-    -- Insert matching articles ordered by importance_score DESC
-    -- ROW_NUMBER() window function assigns the position column
+    -- insert matching articles ranked by importance_score
     INSERT INTO newsletter_articles (newsletter_id, article_id, position, section_summary)
     SELECT
         v_newsletter_id,
@@ -120,7 +95,7 @@ BEGIN
         LIMIT 20
     ) AS ranked;
 
-    -- Update article_count on the edition
+    -- update the count
     UPDATE newsletter_editions
     SET article_count = (
         SELECT COUNT(*) FROM newsletter_articles
@@ -128,17 +103,12 @@ BEGIN
     )
     WHERE id = v_newsletter_id;
 
-    -- Return the new edition id
     SELECT v_newsletter_id AS newsletter_id;
 END$$
 DELIMITER ;
 
 
--- ─────────────────────────────────────────────────────────
--- ADDITIONAL INDEXES
--- Supplement Django's auto-generated indexes for the filter
--- queries run inside the stored procedure.
--- ─────────────────────────────────────────────────────────
+-- extra indexes for the stored procedure queries
 CREATE INDEX IF NOT EXISTS idx_articles_published_at   ON articles(published_at);
 CREATE INDEX IF NOT EXISTS idx_article_tags_tag_id     ON article_tags(tag_id);
 CREATE INDEX IF NOT EXISTS idx_article_tags_article_id ON article_tags(article_id);
